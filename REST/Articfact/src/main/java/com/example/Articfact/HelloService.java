@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,11 +54,14 @@ public class HelloService {
 
         // Parcourir la liste des voitures et ajouter une carte HTML pour chacune
         for (cars car : cars) {
-            result.append("<div class='car'>")
-                .append("<div class='car-header'>Plaque : ").append(car.getPlateNumber()).append("</div>")
-                .append("<div class='car-details'>Marque : ").append(car.getBrand()).append("</div>")
-                .append("<div class='car-details'>Prix : <span class='price'>").append(car.getPrice()).append("€</span></div>")
-                .append("</div>");
+            if (!car.isRented()) {
+                result.append("<div class='car'>")
+                    .append("<div class='car-header'>Plaque : ").append(car.getPlateNumber()).append("</div>")
+                    .append("<div class='car-details'>Marque : ").append(car.getBrand()).append("</div>")
+                    .append("<div class='car-details'>Prix : <span class='price'>").append(car.getPrice()).append("€</span></div>")
+                    .append("<div class='rental-status'>Location : ").append(car.isRented() ? "Oui" : "Non").append("</div>")
+                    .append("</div>");
+                }
         }
 
         // Fin du HTML
@@ -65,46 +70,58 @@ public class HelloService {
         return result.toString();
     }
 
-    // Route pour louer une voiture
-    /**@PutMapping("/cars/{plateNumber}/rent")
-    public String rentCar(@PathVariable String plateNumber) {
+    @PutMapping("/cars/{plateNumber}")
+    public String rentCar(@PathVariable("plateNumber") String plateNumber) {
+        System.out.println("Début du processus de location pour la voiture avec plaque : " + plateNumber);
         StringBuilder result = new StringBuilder();
     
-        // Début du HTML avec CSS pour formater la réponse
-        result.append("<html><head><style>")
-              .append("body { font-family: Arial, sans-serif; background-color: #f4f4f9; }")
-              .append(".result-container { width: 80%; margin: 20px auto; text-align: center; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }")
-              .append(".success { color: #4CAF50; font-size: 18px; font-weight: bold; }")
-              .append(".error { color: #f44336; font-size: 18px; font-weight: bold; }")
-              .append("</style></head><body>")
-              .append("<div class='result-container'>");
+        result.append("<html><head><style>...</style></head><body><div class='result-container'>");
     
-        // Parcourir la liste des voitures pour trouver celle à louer
         for (cars car : cars) {
+            System.out.println("Voiture en cours de vérification : " + car.getPlateNumber());
             if (car.getPlateNumber().equals(plateNumber)) {
+                System.out.println("Correspondance trouvée pour la plaque : " + plateNumber);
                 if (!car.isRented()) {
-                    car.setRented(true); // Louer la voiture
+                    car.setRented(true);
                     result.append("<div class='success'>La voiture avec la plaque ")
                           .append(plateNumber).append(" a été louée avec succès.</div>");
+                    System.out.println("Voiture louée avec succès : " + plateNumber);
                 } else {
                     result.append("<div class='error'>La voiture avec la plaque ")
                           .append(plateNumber).append(" est déjà louée.</div>");
+                    System.out.println("Voiture déjà louée : " + plateNumber);
                 }
                 result.append("</div></body></html>");
-                return result.toString();  // Retourner la réponse HTML
+                return result.toString();
             }
         }
     
-        // Si la voiture n'est pas trouvée
+        System.out.println("Aucune voiture trouvée avec la plaque : " + plateNumber);
         result.append("<div class='error'>Voiture avec la plaque ").append(plateNumber)
               .append(" non trouvée.</div></div></body></html>");
         return result.toString();
     }
     
-    @GetMapping("/cars/{plateNumber}/rent")
-    public String rentCarViaGet(@PathVariable String plateNumber) {
-        return rentCar(plateNumber);  // Appelle la méthode PUT pour réutiliser la logique
-    }*/
+
+// voiture nos louer 
+@GetMapping("/cars/unrented")
+public String listOfUnrentedCars() {
+    StringBuilder result = new StringBuilder();
+    result.append("<html><head><style>...</style></head><body><div class='car-container'>");
+
+    for (cars car : cars) {
+        if (!car.isRented()) {
+            result.append("<div class='car'>")
+                  .append("<div class='car-header'>Plaque : ").append(car.getPlateNumber()).append("</div>")
+                  .append("<div class='car-details'>Marque : ").append(car.getBrand()).append("</div>")
+                  .append("<div class='car-details'>Prix : <span class='price'>").append(car.getPrice()).append("€</span></div>")
+                  .append("</div>");
+        }
+    }
+
+    result.append("</div></body></html>");
+    return result.toString();
+}
 
 
 }

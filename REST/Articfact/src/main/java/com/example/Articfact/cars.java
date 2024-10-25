@@ -32,6 +32,6 @@ public class cars {
     }
 
     public void setRented(boolean rented) {
-        isRented = rented;
+        this.isRented = rented;
     }
 }
