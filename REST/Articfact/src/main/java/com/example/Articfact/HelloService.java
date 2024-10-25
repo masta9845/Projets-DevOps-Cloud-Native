@@ -18,6 +18,8 @@ public class HelloService {
         cars.add(new cars("33BB44", "Tesla", 80));
         cars.add(new cars("55CC66", "BMW", 90));
         cars.add(new cars("45CC66", "Audi", 90));
+        cars.add(new cars("45CX66", "Renault", 90));
+
     }
 
     @GetMapping("/")
